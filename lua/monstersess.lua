@@ -100,6 +100,10 @@ function M:scheduleSaveSessionBeforeExit()
         desc = "Save the session before quitting neovim",
         callback = function()
             if self.shouldSaveOnExit then
+                for _, fn in ipairs(self.runBeforeExit) do
+                    fn()
+                end
+
                 M:saveSession()
             end
         end
