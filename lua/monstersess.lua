@@ -29,6 +29,11 @@ function M:setup(opts)
     self.sessionExists = vim.fn.filereadable(config.sessionPath) == 1
     self.shouldSaveOnExit = self.sessionExists
     self.pattern = 'Monstersession'
+
+    if M.sessionExists then
+        M:loadSession()
+        M:scheduleSaveSessionBeforeExit()
+    end
 end
 
 function M:notify()
