@@ -65,6 +65,7 @@ function M:deleteSession()
         vim.fs.rm(config.sessionDir, { force = true, recursive = true })
         self.sessionExists = false
         self.shouldSaveOnExit = false
+        self:notify()
         print("Session deleted")
     else
         print("No session found")
