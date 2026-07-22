@@ -1,13 +1,15 @@
 --- @class M
---- @field sessionExists boolean True if a session exists. Can be set if a session is found on
---- startup or if the user created a new session
---- @field shouldSaveOnExit boolean Controls whether the session will be saved when exitting nvim
 --- @field pattern string Pattern to listen in autocmds
+--- @field sessionExists boolean True if a session exists. Is set when a session is found on startup or if the user created a new session
+--- @field shouldSaveOnExit boolean Controls whether the session will be saved when exitting nvim
+--- @field runBeforeExit fun()[] Array of function that are run before saving the session and
+--- exitting
 ---
 local M = {
     pattern = "",
     sessionExists = false,
-    shouldSaveOnExit = false
+    shouldSaveOnExit = false,
+    runBeforeExit = {}
 }
 M.__index = M
 
@@ -60,6 +62,14 @@ function M:saveSession()
     print("Session saved")
 end
 
+function M:saveOrCreateSession()
+    if not self.sessionExists then
+        self:createSession()
+    else
+        self:saveSession()
+    end
+end
+
 function M:loadSession()
     vim.cmd("so " .. config.sessionPath)
     print("Session loaded")
@@ -75,6 +85,12 @@ function M:deleteSession()
     else
         print("No session found")
     end
+end
+
+--- Add a function to run before the session saves when exitting vim
+--- @param f fun()
+function M:addBeforeExit(f)
+    table.insert(self.runBeforeExit, f)
 end
 
 --- Register an autocmd to save the current state of the session before exiting vim
